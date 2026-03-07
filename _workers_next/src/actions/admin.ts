@@ -543,6 +543,7 @@ export async function saveShopLogo(logoUrl: string) {
     }
 
     await setSetting('shop_logo', url)
+    await setSetting('shop_logo_source', url ? 'custom' : 'generated')
     await setSetting('shop_logo_updated_at', String(Date.now()))
     revalidatePath('/')
     revalidatePath('/admin/products')

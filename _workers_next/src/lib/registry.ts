@@ -1,4 +1,5 @@
 import { getSetting, setSetting } from "@/lib/db/queries"
+import { buildShopFaviconUrl, resolveEffectiveShopLogo } from "@/lib/shop-logo"
 import { APP_VERSION } from "@/lib/version"
 
 export const REGISTRY_APP_ID = "ldc-shop"
@@ -33,20 +34,23 @@ export async function ensureRegistryInstanceId(): Promise<string> {
 }
 
 export async function getRegistryMetadata(origin: string) {
-    const [name, description, logo, instanceId, verifyToken] = await Promise.all([
+    const [name, description, logo, logoSource, logoUpdatedAt, instanceId, verifyToken] = await Promise.all([
         getSetting("shop_name"),
         getSetting("shop_description"),
         getSetting("shop_logo"),
+        getSetting("shop_logo_source"),
+        getSetting("shop_logo_updated_at"),
         ensureRegistryInstanceId(),
         getSetting("registry_challenge_token"),
     ])
+    const resolvedLogo = resolveEffectiveShopLogo(logo, logoSource).effectiveLogo
 
     return {
         app: REGISTRY_APP_ID,
         version: APP_VERSION,
         name: (name || "LDC Shop").trim(),
         description: (description || "").trim(),
-        logo: (logo || "").trim(),
+        logo: resolvedLogo || buildShopFaviconUrl(origin, logoUpdatedAt),
         url: origin,
         instanceId,
         verifyToken: (verifyToken || "").trim(),

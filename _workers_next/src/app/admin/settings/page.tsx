@@ -4,6 +4,7 @@ import { AdminSettingsContent } from "@/components/admin/settings-content"
 import { unstable_noStore } from "next/cache"
 import { cookies } from "next/headers"
 import { APP_VERSION } from "@/lib/version"
+import { resolveEffectiveShopLogo } from "@/lib/shop-logo"
 
 export default async function AdminSettingsPage() {
     const cookieStore = await cookies()
@@ -18,7 +19,7 @@ export default async function AdminSettingsPage() {
 
     const shopName = settingsMap['shop_name'] || null
     const shopDescription = settingsMap['shop_description'] || null
-    const shopLogo = settingsMap['shop_logo'] || null
+    const shopLogo = resolveEffectiveShopLogo(settingsMap['shop_logo'] || '', settingsMap['shop_logo_source'] || '').effectiveLogo || null
     const shopFooter = settingsMap['shop_footer'] || null
     const themeColor = settingsMap['theme_color'] || null
 
